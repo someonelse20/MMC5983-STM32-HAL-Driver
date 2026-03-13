@@ -20,7 +20,8 @@
 #define INC_MMC5983_H_
 
 
-#include "stm32f4xx_hal.h"
+#include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_i2c.h"
 
 
 // --- Registers ---
@@ -77,32 +78,32 @@
 // --- Interrupt Map ---
 #define MMC_INT_DATA_READY			0x04
 
-// --- SPI Commands ---
+// --- I2C Commands ---
 #define MMC_Read_Command			0x80
 #define MMC_Read_Multiple_Command	0xC0
-#define MMC_Write_command			0x00
+#define MMC_Write_Command			0x00
+#define MMC_I2C_Adress				0x30
 
 // --- Reset Command ---
 #define MMC5983_SW_Reset_Mask		0x80
 
-// --- SPI Timeout (ms) ---
+// --- I2C Timeout (ms) ---
 #define MMC_Timeout	10
 
 // --- Error Status Enum ---
 typedef enum {
 	MMC_NO_ERROR 			=	0x00U, 	/**< No error */
 	MMC_ERROR	  			=	0x01U, 	/**< Generic error */
-	MMC_HAL_ERROR			= 	0x02U, 	/**< HAL communication error */
-	MMC_INV_REG_DATA_READ	= 	0x03U, 	/**< Invalid data read from register */
+	MMC_HAL_ERROR			=	0x02U, 	/**< HAL communication error */
+	MMC_INV_REG_DATA_READ	=	0x03U, 	/**< Invalid data read from register */
 	MMC_ID_VERIFY_ERROR		=	0x04U, 	/**< Device ID verification failed */
 } MMC5983_Error_TypeDef;
 
 // --- Hardware Initialization Structure ---
 typedef struct {
-	SPI_HandleTypeDef *SPIhandler; 	/**< Pointer to SPI handler */
-	GPIO_TypeDef *CS_GPIOport;     	/**< GPIO port for chip select */
-	uint16_t CS_GPIOpin;			/**< GPIO pin number for chip select */
-	uint8_t	SPI_Timeout;			/**< SPI timeout in milliseconds */
+	I2C_HandleTypeDef *I2C_handler; 	/**< Pointer to I2C handler */
+	uint16_t I2C_Addr;				/**< I2C address */
+	uint8_t I2C_Timeout;			/**< I2C timeout in milliseconds */
 	uint8_t INT_CTRL_0_Reg;         /**< Interrupt control register 0 content */
 	uint8_t INT_CTRL_1_Reg;         /**< Interrupt control register 1 content */
 	uint8_t INT_CTRL_2_Reg;         /**< Interrupt control register 2 content */
@@ -218,20 +219,6 @@ MMC5983_Error_TypeDef MMC5983_SingleRegister_Read(MMC5983_HW_InitTypeDef *, uint
  * @retval MMC5983_Error_TypeDef
  */
 MMC5983_Error_TypeDef MMC5983_SingleRegister_Write(MMC5983_HW_InitTypeDef *, uint8_t, uint8_t);
-
-/**
- * @brief  Enable chip select (CS) pin for SPI communication
- * @param  CS_GPIOport GPIO port of the CS pin
- * @param  CS_GPIOpin GPIO pin number of the CS pin
- */
-void enableCS_MMC5983(GPIO_TypeDef *, uint16_t);
-
-/**
- * @brief  Disable chip select (CS) pin for SPI communication
- * @param  CS_GPIOport GPIO port of the CS pin
- * @param  CS_GPIOpin GPIO pin number of the CS pin
- */
-void disableCS_MMC5983(GPIO_TypeDef *, uint16_t);
 
 
 #endif /* INC_MMC5983_H_ */

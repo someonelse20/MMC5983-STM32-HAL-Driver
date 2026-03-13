@@ -17,10 +17,13 @@
  */
 
 
-#include <MMC5983.h>
+#include "MMC5983.h"
+#include "stm32h7xx_hal_def.h"
+#include "stm32h7xx_hal_i2c.h"
+#include "stm32h7xx_hal_spi.h"
 
 
-/* Private SPI Handler */
+/* Private I2C Handler */
 
 
 
@@ -171,32 +174,19 @@ MMC5983_Error_TypeDef MMC5983_Set_Interrupt_Measurement(MMC5983_HW_InitTypeDef *
 }
 
 /**
- * @brief  Read X, Y, Z magnetometer data using sequential SPI access
- * @note   Enables multi-byte SPI access and reads 6 bytes from data registers
+ * @brief  Read X, Y, Z magnetometer data using sequential I2C access
+ * @note   Enables multi-byte I2C access and reads 6 bytes from data registers
  * @param  MMC5983_Handler Pointer to the MMC5983_HW_InitTypeDef structure
  * @param  MMC5983_Data Pointer to the MMC5983_Data_TypeDef structure to store raw data
  * @retval MMC5983_Error_TypeDef Status of the operation
  */
 MMC5983_Error_TypeDef MMC5983_Data_Read(MMC5983_HW_InitTypeDef *MMC5983_Handler, MMC5983_Data_TypeDef *MMC5983_Data){
-	uint8_t SPITransmitData_MMC;
-	uint8_t MMC_Data_Reply[7];
+	uint8_t MMC_Data_Reply[7]; // NOTE: If this isn't working try changing the array size to 6 instead of 7.
 
-	SPITransmitData_MMC = (MMC_Read_Command | MMC_DATA_ADDRESS_INIT);
-
-
-	enableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-	if(HAL_SPI_Transmit(MMC5983_Handler->SPIhandler, &SPITransmitData_MMC, 1, MMC5983_Handler->SPI_Timeout) != HAL_OK)
+	if(HAL_I2C_Mem_Read(MMC5983_Handler->I2C_handler, MMC5983_Handler->I2C_Addr, MMC_DATA_ADDRESS_INIT, 1, MMC_Data_Reply, 6, MMC5983_Handler->I2C_Timeout) != HAL_OK)
 	{
-		disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
 		return MMC_HAL_ERROR;
 	}
-	if(HAL_SPI_Receive(MMC5983_Handler->SPIhandler, MMC_Data_Reply, 6, MMC5983_Handler->SPI_Timeout) != HAL_OK)
-	{
-		disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-		return MMC_HAL_ERROR;
-	}
-	disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-
 
 	MMC5983_Data->axes.DX =  (int16_t)((MMC_Data_Reply[0]<<8) |  MMC_Data_Reply[1]);
 	MMC5983_Data->axes.DY =  (int16_t)((MMC_Data_Reply[2]<<8) |  MMC_Data_Reply[3]);
@@ -214,21 +204,10 @@ MMC5983_Error_TypeDef MMC5983_Data_Read(MMC5983_HW_InitTypeDef *MMC5983_Handler,
  */
 MMC5983_Error_TypeDef MMC5983_SingleRegister_Write(MMC5983_HW_InitTypeDef *MMC5983_Handler, uint8_t MMC5983_Register_Addr, uint8_t MMC5983_Write_Data)
 {
-	uint8_t SPITransmitData_MMC;
-	SPITransmitData_MMC = (MMC_Write_command | MMC5983_Register_Addr);
-
-	enableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-	if(HAL_SPI_Transmit(MMC5983_Handler->SPIhandler, &SPITransmitData_MMC, 1, MMC5983_Handler->SPI_Timeout) != HAL_OK)
+	if(HAL_I2C_Mem_Write(MMC5983_Handler->I2C_handler, MMC5983_Handler->I2C_Addr, MMC5983_Register_Addr, 1, &MMC5983_Write_Data, 1, MMC5983_Handler->I2C_Timeout) != HAL_OK)
 	{
-		disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
 		return MMC_HAL_ERROR;
 	}
-	if(HAL_SPI_Transmit(MMC5983_Handler->SPIhandler, &MMC5983_Write_Data, 1, MMC5983_Handler->SPI_Timeout) != HAL_OK)
-	{
-		disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-		return MMC_HAL_ERROR;
-	}
-	disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
 
 	return MMC_NO_ERROR;
 }
@@ -242,41 +221,10 @@ MMC5983_Error_TypeDef MMC5983_SingleRegister_Write(MMC5983_HW_InitTypeDef *MMC59
  */
 MMC5983_Error_TypeDef MMC5983_SingleRegister_Read(MMC5983_HW_InitTypeDef *MMC5983_Handler, uint8_t MMC5983_Register_Addr, uint8_t *pData)
 {
-	uint8_t SPITransmitData_MMC;
-	SPITransmitData_MMC = (MMC_Read_Command | MMC5983_Register_Addr);
-
-	enableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-	if(HAL_SPI_Transmit(MMC5983_Handler->SPIhandler, &SPITransmitData_MMC, 1, MMC5983_Handler->SPI_Timeout) != HAL_OK)
+	if(HAL_I2C_Mem_Read(MMC5983_Handler->I2C_handler, MMC5983_Handler->I2C_Addr, MMC5983_Register_Addr, 1, pData, 1, MMC5983_Handler->I2C_Timeout) != HAL_OK)
 	{
-		disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
 		return MMC_HAL_ERROR;
 	}
-	if(HAL_SPI_Receive(MMC5983_Handler->SPIhandler, pData, 1, MMC5983_Handler->SPI_Timeout) != HAL_OK)
-	{
-		disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
-		return MMC_HAL_ERROR;
-	}
-	disableCS_MMC5983(MMC5983_Handler->CS_GPIOport, MMC5983_Handler->CS_GPIOpin);
 
 	return MMC_NO_ERROR;
-}
-
-/**
- * @brief  Enable the chip select pin for SPI communication
- * @param  CS_GPIOport GPIO port of the chip select pin
- * @param  CS_GPIOpin GPIO pin number of the chip select
- * @retval None
- */
-void enableCS_MMC5983(GPIO_TypeDef *CS_GPIOport, uint16_t CS_GPIOpin){
-  HAL_GPIO_WritePin(CS_GPIOport, CS_GPIOpin, GPIO_PIN_RESET);
-}
-
-/**
- * @brief  Disable the chip select pin for SPI communication
- * @param  CS_GPIOport GPIO port of the chip select pin
- * @param  CS_GPIOpin GPIO pin number of the chip select
- * @retval None
- */
-void disableCS_MMC5983(GPIO_TypeDef *CS_GPIOport, uint16_t CS_GPIOpin){
-  HAL_GPIO_WritePin(CS_GPIOport, CS_GPIOpin, GPIO_PIN_SET);
 }
