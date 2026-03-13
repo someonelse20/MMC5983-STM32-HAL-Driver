@@ -82,7 +82,7 @@
 #define MMC_Read_Command			0x80
 #define MMC_Read_Multiple_Command	0xC0
 #define MMC_Write_Command			0x00
-#define MMC_I2C_Adress				0x30
+#define MMC_DEV_Address				0x30
 
 // --- Reset Command ---
 #define MMC5983_SW_Reset_Mask		0x80
@@ -102,7 +102,6 @@ typedef enum {
 // --- Hardware Initialization Structure ---
 typedef struct {
 	I2C_HandleTypeDef *I2C_handler; 	/**< Pointer to I2C handler */
-	uint16_t I2C_Addr;				/**< I2C address */
 	uint8_t I2C_Timeout;			/**< I2C timeout in milliseconds */
 	uint8_t INT_CTRL_0_Reg;         /**< Interrupt control register 0 content */
 	uint8_t INT_CTRL_1_Reg;         /**< Interrupt control register 1 content */

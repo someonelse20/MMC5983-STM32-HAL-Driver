@@ -183,7 +183,7 @@ MMC5983_Error_TypeDef MMC5983_Set_Interrupt_Measurement(MMC5983_HW_InitTypeDef *
 MMC5983_Error_TypeDef MMC5983_Data_Read(MMC5983_HW_InitTypeDef *MMC5983_Handler, MMC5983_Data_TypeDef *MMC5983_Data){
 	uint8_t MMC_Data_Reply[7]; // NOTE: If this isn't working try changing the array size to 6 instead of 7.
 
-	if(HAL_I2C_Mem_Read(MMC5983_Handler->I2C_handler, MMC5983_Handler->I2C_Addr, MMC_DATA_ADDRESS_INIT, 1, MMC_Data_Reply, 6, MMC5983_Handler->I2C_Timeout) != HAL_OK)
+	if(HAL_I2C_Mem_Read(MMC5983_Handler->I2C_handler, MMC_DEV_Address, MMC_DATA_ADDRESS_INIT, 1, MMC_Data_Reply, 6, MMC5983_Handler->I2C_Timeout) != HAL_OK)
 	{
 		return MMC_HAL_ERROR;
 	}
@@ -204,7 +204,7 @@ MMC5983_Error_TypeDef MMC5983_Data_Read(MMC5983_HW_InitTypeDef *MMC5983_Handler,
  */
 MMC5983_Error_TypeDef MMC5983_SingleRegister_Write(MMC5983_HW_InitTypeDef *MMC5983_Handler, uint8_t MMC5983_Register_Addr, uint8_t MMC5983_Write_Data)
 {
-	if(HAL_I2C_Mem_Write(MMC5983_Handler->I2C_handler, MMC5983_Handler->I2C_Addr, MMC5983_Register_Addr, 1, &MMC5983_Write_Data, 1, MMC5983_Handler->I2C_Timeout) != HAL_OK)
+	if(HAL_I2C_Mem_Write(MMC5983_Handler->I2C_handler, MMC_DEV_Address, MMC5983_Register_Addr, 1, &MMC5983_Write_Data, 1, MMC5983_Handler->I2C_Timeout) != HAL_OK)
 	{
 		return MMC_HAL_ERROR;
 	}
@@ -221,7 +221,7 @@ MMC5983_Error_TypeDef MMC5983_SingleRegister_Write(MMC5983_HW_InitTypeDef *MMC59
  */
 MMC5983_Error_TypeDef MMC5983_SingleRegister_Read(MMC5983_HW_InitTypeDef *MMC5983_Handler, uint8_t MMC5983_Register_Addr, uint8_t *pData)
 {
-	if(HAL_I2C_Mem_Read(MMC5983_Handler->I2C_handler, MMC5983_Handler->I2C_Addr, MMC5983_Register_Addr, 1, pData, 1, MMC5983_Handler->I2C_Timeout) != HAL_OK)
+	if(HAL_I2C_Mem_Read(MMC5983_Handler->I2C_handler, MMC_DEV_Address, MMC5983_Register_Addr, 1, pData, 1, MMC5983_Handler->I2C_Timeout) != HAL_OK)
 	{
 		return MMC_HAL_ERROR;
 	}
