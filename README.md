@@ -1,7 +1,7 @@
 # MMC5983 STM32 HAL Driver
 
 This is a fork of [NathanNetzel's SPI MMC5983 Driver](https://github.com/NathanNetzel/MMC5983-STM32-HAL-Driver)
-C driver library for the MMC5983 3-axis magnetometer sensor.  
+for the MMC5983 3-axis magnetometer sensor.  
 Designed for STM32 microcontrollers using the STM32 HAL library and I2C interface.
 
 ---
