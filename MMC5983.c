@@ -20,7 +20,6 @@
 #include "MMC5983.h"
 #include "stm32h7xx_hal_def.h"
 #include "stm32h7xx_hal_i2c.h"
-#include "stm32h7xx_hal_spi.h"
 
 
 /* Private I2C Handler */
