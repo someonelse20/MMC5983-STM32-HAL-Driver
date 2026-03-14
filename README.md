@@ -31,7 +31,7 @@ Designed for STM32 microcontrollers using the STM32 HAL library and I2C interfac
 ---
 
 **Note:**  
-This driver includes `#include "stm32f4xx_hal.h"` in the header files and is configured for STM32F4 series.  
+This driver includes `#include "stm32h7xx_hal.h"` in the header files and is configured for STM32H7 series.  
 For other STM32 families, adjust the HAL include and any hardware-specific settings accordingly.
 
 ## **Quick Start**
@@ -42,16 +42,14 @@ Include `MMC5983.c` and `MMC5983.h` in your STM32 project source folder.
 
 2. Configure your hardware
 
-Set up SPI peripheral and GPIO pins for SPI and Chip Select (CS) according to your board schematic.
+Set up I2C peripheral according to your board schematic.
 
 3. Initialize driver handle structure
 
 ```c
 MMC5983_HW_InitTypeDef MMC5983_Handle = {
-    .SPIhandler = &hspi1,             // Your SPI handle configured in your project
-    .CS_GPIOport = GPIOA,             // GPIO port of CS pin
-    .CS_GPIOpin = GPIO_PIN_4,         // GPIO pin of CS
-    .SPI_Timeout = 100                // SPI timeout in milliseconds
+    .I2Chandler = &hspi1,             // Your I2C handle configured in your project
+    .I2C_Timeout = 100                // I2C timeout in milliseconds
 };
 ```
 
